@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>CodePocket</title>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0f;--surface:#111118;--surface2:#1a1a24;--border:#2a2a38;
+  --accent:#7c6af7;--green:#4ade80;--yellow:#fbbf24;--red:#f87171;--blue:#60a5fa;
+  --text:#e8e8f0;--muted:#6b6b7d;
+  --hh:52px;--th:44px;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Fira Code',monospace}
+
+/* ── HEADER ── */
+#header{
+  height:var(--hh);background:var(--surface);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;padding:0 12px;z-index:20;
+}
+#proj-btn{
+  height:34px;padding:0 10px;border-radius:8px;
+  background:var(--surface2);border:1px solid var(--border);
+  display:flex;align-items:center;gap:6px;cursor:pointer;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:12px;color:var(--text);
+  -webkit-tap-highlight-color:transparent;transition:all .15s;flex-shrink:0;max-width:130px;
+}
+#proj-btn:active{background:var(--accent);border-color:var(--accent)}
+#proj-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
+.spacer{flex:1}
+.hbtn{
+  height:34px;padding:0 11px;border-radius:8px;border:none;
+  font-family:'Syne',sans-serif;font-weight:800;font-size:12px;
+  cursor:pointer;display:flex;align-items:center;gap:5px;
+  transition:all .15s;-webkit-tap-highlight-color:transparent;flex-shrink:0;
+}
+.hbtn.green{background:var(--green);color:#0a0a0f}
+.hbtn.purple{background:var(--accent);color:#fff}
+.hbtn:active{transform:scale(0.95);filter:brightness(0.85)}
+.icon-btn{
+  width:34px;height:34px;border-radius:8px;
+  background:var(--surface2);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:15px;transition:all .15s;flex-shrink:0;
+  -webkit-tap-highlight-color:transparent;
+}
+.icon-btn:active{background:var(--accent);transform:scale(0.92)}
+
+/* ── TABS ── */
+#tabs{
+  height:var(--th);background:var(--surface);border-bottom:1px solid var(--border);
+  display:flex;align-items:stretch;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;
+}
+#tabs::-webkit-scrollbar{display:none}
+.tab{
+  flex-shrink:0;padding:0 10px;
+  display:flex;align-items:center;gap:6px;
+  font-size:12px;font-weight:600;cursor:pointer;
+  border-bottom:2px solid transparent;color:var(--muted);
+  white-space:nowrap;-webkit-tap-highlight-color:transparent;user-select:none;transition:color .15s;
+}
+.tab.active{color:var(--text);border-bottom-color:var(--accent)}
+.tab-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.tab-name{max-width:80px;overflow:hidden;text-overflow:ellipsis}
+.tab-x{
+  width:15px;height:15px;border-radius:3px;display:flex;align-items:center;
+  justify-content:center;font-size:10px;color:var(--muted);flex-shrink:0;
+  opacity:0;transition:opacity .15s;
+}
+.tab.active .tab-x{opacity:1}
+.tab-x:active{background:var(--red);color:#fff}
+#add-file-btn{
+  flex-shrink:0;width:38px;display:flex;align-items:center;justify-content:center;
+  font-size:20px;color:var(--muted);cursor:pointer;-webkit-tap-highlight-color:transparent;
+}
+#add-file-btn:active{color:var(--accent)}
+
+/* ── MAIN ── */
+#main{height:calc(100dvh - var(--hh) - var(--th));display:flex;flex-direction:column}
+
+/* mode bar */
+#mode-bar{
+  height:32px;background:var(--surface2);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 8px;gap:4px;flex-shrink:0;
+}
+.mode-btn{
+  flex:1;height:22px;border-radius:5px;background:none;border:none;
+  color:var(--muted);font-family:'Fira Code',monospace;font-size:11px;font-weight:600;
+  cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent;
+}
+.mode-btn.active{background:var(--accent);color:#fff}
+
+#workspace{flex:1;overflow:hidden;display:flex;flex-direction:column}
+
+/* editor */
+#editor-wrap{flex:1;overflow:hidden;display:flex;flex-direction:column}
+.editor-container{flex:1;overflow:hidden}
+#code-input{
+  width:100%;height:100%;padding:12px;
+  background:transparent;color:var(--text);
+  font-family:'Fira Code',monospace;font-size:13px;
+  line-height:1.7;border:none;outline:none;resize:none;
+  overflow-y:auto;white-space:pre;overflow-x:auto;
+  caret-color:var(--accent);
+  scrollbar-width:thin;scrollbar-color:var(--border) transparent;
+  tab-size:2;display:block;
+}
+
+
+
+/* preview */
+#preview-wrap{flex:1;overflow:hidden;display:flex;flex-direction:column}
+#preview-header{
+  height:32px;background:var(--surface2);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 10px;gap:8px;flex-shrink:0;
+}
+.url-bar{
+  flex:1;height:22px;border-radius:5px;
+  background:var(--surface);border:1px solid var(--border);
+  color:var(--muted);font-size:11px;padding:0 8px;display:flex;align-items:center;
+}
+#preview-frame{flex:1;border:none;background:#fff;width:100%;display:block}
+
+/* console */
+#console-wrap{
+  height:120px;border-top:1px solid var(--border);
+  background:var(--bg);display:flex;flex-direction:column;transition:height .2s;flex-shrink:0;
+}
+#console-wrap.collapsed{height:28px}
+#console-header{
+  height:28px;background:var(--surface2);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 10px;gap:8px;cursor:pointer;flex-shrink:0;
+}
+.con-title{font-size:11px;font-weight:600;color:var(--muted);flex:1}
+.con-badge{background:var(--red);color:#fff;font-size:10px;font-weight:700;border-radius:4px;padding:1px 5px;display:none}
+#console-body{flex:1;overflow-y:auto;padding:4px 10px;font-size:11px;line-height:1.6;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.cline{display:flex;gap:8px;padding:2px 0;border-bottom:1px solid #1a1a24}
+.cline .ct{color:var(--muted);flex-shrink:0}
+.cline .cm{flex:1;word-break:break-all}
+.cline.log .cm{color:var(--text)}
+.cline.warn .cm{color:var(--yellow)}
+.cline.error .cm{color:var(--red)}
+.cline.info .cm{color:var(--blue)}
+
+.hidden{display:none!important}
+
+/* toast */
+#toast{
+  position:fixed;top:60px;left:50%;
+  transform:translateX(-50%) translateY(-8px);
+  background:var(--surface);border:1px solid var(--accent);color:var(--text);
+  padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;
+  opacity:0;transition:all .2s;z-index:500;pointer-events:none;white-space:nowrap;
+  box-shadow:0 4px 20px rgba(0,0,0,.5);
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── OVERLAYS ── */
+.overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:600;
+  display:flex;align-items:flex-end;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.overlay.open{opacity:1;pointer-events:all}
+.sheet{
+  width:100%;background:var(--surface);border-radius:18px 18px 0 0;
+  padding:20px 20px 36px;transform:translateY(100%);transition:transform .25s;
+}
+.overlay.open .sheet{transform:translateY(0)}
+.sh-title{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;margin-bottom:14px}
+.sh-input{
+  width:100%;height:42px;border-radius:9px;
+  background:var(--surface2);border:1px solid var(--border);
+  color:var(--text);font-family:'Fira Code',monospace;font-size:13px;
+  padding:0 12px;outline:none;margin-bottom:12px;
+}
+.sh-input:focus{border-color:var(--accent)}
+.sh-row{display:flex;gap:8px}
+.sh-btn{
+  flex:1;height:40px;border-radius:9px;border:none;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:all .15s;
+}
+.sh-btn.cancel{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
+.sh-btn.ok{background:var(--accent);color:#fff}
+.sh-btn:active{transform:scale(.97)}
+.presets{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.preset{
+  padding:5px 10px;border-radius:7px;border:1px solid var(--border);
+  background:var(--surface2);color:var(--text);font-size:11px;font-weight:600;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;font-family:'Fira Code',monospace;
+}
+.preset:active{background:var(--accent);border-color:var(--accent)}
+
+/* ── PROJECT PANEL (full screen) ── */
+#proj-panel{
+  position:fixed;inset:0;background:var(--bg);z-index:400;
+  display:flex;flex-direction:column;
+  transform:translateX(-100%);transition:transform .25s;
+  overflow:hidden;
+}
+#proj-panel.open{transform:translateX(0)}
+#proj-panel-header{
+  height:var(--hh);background:var(--surface);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 14px;gap:10px;
+}
+#proj-panel-header .back{
+  width:34px;height:34px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;
+  -webkit-tap-highlight-color:transparent;
+}
+#proj-panel-header .back:active{background:var(--accent)}
+#proj-panel-title{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;flex:1}
+#new-proj-btn{
+  height:34px;padding:0 12px;border-radius:8px;background:var(--accent);border:none;
+  color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+}
+#new-proj-btn:active{filter:brightness(.85)}
+#proj-list{flex:1;overflow-y:auto;padding:12px}
+.proj-item{
+  display:flex;align-items:center;gap:10px;
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:14px 14px;margin-bottom:8px;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;transition:border-color .15s;
+}
+.proj-item.active-proj{border-color:var(--accent)}
+.proj-item:active{background:var(--surface2)}
+.proj-icon{
+  width:36px;height:36px;border-radius:9px;background:var(--surface2);
+  display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;
+}
+.proj-info{flex:1;overflow:hidden}
+.proj-item-name{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.proj-item-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.proj-actions{display:flex;gap:6px}
+.proj-act{
+  width:28px;height:28px;border-radius:7px;background:var(--surface2);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+.proj-act:active{background:var(--accent)}
+
+/* download sheet */
+#dl-sheet .file-list{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;max-height:240px;overflow-y:auto}
+.dl-file-item{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;
+  background:var(--surface2);border:1px solid var(--border);border-radius:9px;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;transition:border-color .15s;
+}
+.dl-file-item:active{border-color:var(--accent)}
+.dl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dl-fname{flex:1;font-size:12px;font-weight:600}
+.dl-size{font-size:11px;color:var(--muted)}
+.dl-all-btn{
+  width:100%;height:40px;border-radius:9px;border:none;
+  background:var(--surface2);border:1px solid var(--border);
+  color:var(--text);font-family:'Syne',sans-serif;font-weight:700;font-size:13px;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+}
+.dl-all-btn:active{background:var(--surface);border-color:var(--accent)}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="header">
+  <div id="proj-btn" onclick="openProjects()">
+    <span>📁</span>
+    <span id="proj-name">Mon Projet</span>
+  </div>
+  <div class="spacer"></div>
+  <button class="hbtn green" onclick="openDownload()">⬇ Download</button>
+  <div class="icon-btn" onclick="copyCode()">📋</div>
+</div>
+
+<!-- TABS (fichiers) -->
+<div id="tabs">
+  <div id="add-file-btn" onclick="openNewFile()">＋</div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+  <div id="mode-bar">
+    <button class="mode-btn active" onclick="setMode('editor')">✏️ Éditeur</button>
+    <button class="mode-btn" onclick="setMode('preview')">👁 Aperçu</button>
+  </div>
+
+  <div id="workspace">
+    <div id="editor-wrap">
+      <div class="editor-container">
+        <textarea id="code-input" spellcheck="false" autocorrect="off" autocapitalize="off"
+          placeholder="// Commence à coder..."></textarea>
+      </div>
+
+    </div>
+
+    <div id="preview-wrap" class="hidden">
+      <div id="preview-header">
+        <div class="url-bar">🌐 preview://localhost</div>
+        <div class="icon-btn" style="width:26px;height:26px;font-size:12px" onclick="runCode()">↻</div>
+      </div>
+      <iframe id="preview-frame" sandbox="allow-scripts allow-same-origin"></iframe>
+    </div>
+  </div>
+
+  <div id="console-wrap">
+    <div id="console-header" onclick="toggleConsole()">
+      <span style="font-size:11px">▶</span>
+      <span class="con-title">Console</span>
+      <span class="con-badge" id="err-badge"></span>
+      <span id="con-toggle" style="font-size:10px;color:var(--muted)">▲</span>
+    </div>
+    <div id="console-body"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- PROJECT PANEL -->
+<div id="proj-panel">
+  <div id="proj-panel-header">
+    <div class="back" onclick="closeProjects()">←</div>
+    <div id="proj-panel-title">Projets</div>
+    <button id="new-proj-btn" onclick="openNewProject()">＋ Nouveau</button>
+  </div>
+  <div id="proj-list"></div>
+
+</div>
+
+<!-- NEW FILE -->
+<div class="overlay" id="new-file-panel" onclick="closePanelOverlay('new-file-panel',event)">
+  <div class="sheet">
+    <div class="sh-title">➕ Nouveau fichier</div>
+    <div class="presets">
+      <div class="preset" onclick="setPreset('index.html')">index.html</div>
+      <div class="preset" onclick="setPreset('style.css')">style.css</div>
+      <div class="preset" onclick="setPreset('script.js')">script.js</div>
+      <div class="preset" onclick="setPreset('app.js')">app.js</div>
+      <div class="preset" onclick="setPreset('utils.js')">utils.js</div>
+      <div class="preset" onclick="setPreset('data.json')">data.json</div>
+    </div>
+    <input class="sh-input" id="new-fname" placeholder="mon-fichier.ext" />
+    <div class="sh-row">
+      <button class="sh-btn cancel" onclick="closePanelOverlay('new-file-panel')">Annuler</button>
+      <button class="sh-btn ok" onclick="confirmNewFile()">Créer</button>
+    </div>
+  </div>
+</div>
+
+<!-- RENAME FILE -->
+<div class="overlay" id="rename-panel" onclick="closePanelOverlay('rename-panel',event)">
+  <div class="sheet">
+    <div class="sh-title">✏️ Renommer</div>
+    <input class="sh-input" id="rename-input" placeholder="nouveau-nom.ext" />
+    <div class="sh-row">
+      <button class="sh-btn cancel" onclick="closePanelOverlay('rename-panel')">Annuler</button>
+      <button class="sh-btn ok" onclick="confirmRename()">Renommer</button>
+    </div>
+  </div>
+</div>
+
+<!-- DOWNLOAD -->
+<div class="overlay" id="dl-panel" onclick="closePanelOverlay('dl-panel',event)">
+  <div class="sheet" id="dl-sheet">
+    <div class="sh-title">⬇ Télécharger</div>
+    <div class="file-list" id="dl-file-list"></div>
+    <button class="dl-all-btn" onclick="downloadAll()">⬇ Tout télécharger (un par un)</button>
+  </div>
+</div>
+
+<!-- CONFIRM DELETE -->
+<div class="overlay" id="confirm-panel" onclick="closePanelOverlay('confirm-panel',event)">
+  <div class="sheet">
+    <div class="sh-title" id="confirm-title">Supprimer ?</div>
+    <p id="confirm-msg" style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.5"></p>
+    <div class="sh-row">
+      <button class="sh-btn cancel" onclick="closePanelOverlay('confirm-panel')">Annuler</button>
+      <button class="sh-btn ok" id="confirm-ok-btn" style="background:var(--red)">Supprimer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// STORAGE HELPERS
+// ═══════════════════════════════════════════════════════
+const STORE_KEY = 'codepocket_v2';
+
+function loadStore() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || null; } catch { return null; }
+}
+function saveStore() {
+  // save current textarea before persisting
+  if (state.currentProject && state.currentFile) {
+    const proj = state.projects[state.currentProject];
+    if (proj && proj.files[state.currentFile]) {
+      proj.files[state.currentFile].content = textarea.value;
+    }
+  }
+  try { localStorage.setItem(STORE_KEY, JSON.stringify({ projects: state.projects, currentProject: state.currentProject })); }
+  catch(e) { console.warn('Storage full', e); }
+}
+
+// ═══════════════════════════════════════════════════════
+// DEFAULT PROJECT TEMPLATE
+// ═══════════════════════════════════════════════════════
+function defaultProject(name) {
+  return {
+    name,
+    created: Date.now(),
+    currentFile: 'index.html',
+    files: {
+      'index.html': {
+        color: '#f06292',
+        content: `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${name}</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>👋 ${name}</h1>
+  <p>Modifie ce code et appuie sur <strong>RUN</strong></p>
+  <button onclick="sayHello()">Cliquer ici</button>
+  <div id="output"></div>
+  <script src="script.js"><\/script>
+
+<!-- PROJ MODAL (new / rename / delete project) -->
+<div id="proj-modal" style="
+  display:none;position:fixed;inset:0;z-index:999;
+  background:rgba(0,0,0,0.65);align-items:flex-end;
+" onclick="if(event.target===this)closeProjModal()">
+  <div id="proj-modal-sheet" style="
+    width:100%;background:var(--surface);border-radius:18px 18px 0 0;
+    padding:20px 20px 40px;
+    transform:translateY(100%);transition:transform .25s;
+  ">
+    <div class="sh-title" id="proj-modal-title"></div>
+    <p id="proj-modal-msg" style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.5;display:none"></p>
+    <input class="sh-input" id="proj-modal-input" placeholder="" style="display:none" />
+    <div class="sh-row">
+      <button class="sh-btn cancel" onclick="closeProjModal()">Annuler</button>
+      <button class="sh-btn ok" id="proj-modal-ok">OK</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>`
+      },
+      'style.css': {
+        color: '#60a5fa',
+        content: `body {
+  font-family: system-ui, sans-serif;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  padding: 20px;
+}
+h1 { font-size: 2em; margin-bottom: 16px; }
+button {
+  background: rgba(255,255,255,0.2);
+  color: white;
+  border: 2px solid white;
+  padding: 12px 28px;
+  border-radius: 50px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+button:hover { background: white; color: #764ba2; }
+#output { margin-top: 20px; font-size: 1.3em; }`
+      },
+      'script.js': {
+        color: '#fbbf24',
+        content: `let count = 0;
+function sayHello() {
+  count++;
+  const msgs = ["👋 Salut!", "🔥 C'est chaud!", "⚡ Ultra rapide!", "🎉 Clic n°" + count];
+  document.getElementById('output').textContent = msgs[count % msgs.length];
+  console.log("Clic n°" + count);
+}
+console.log("✅ Script chargé");`
+      }
+    }
+  };
+}
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+let state = { projects: {}, currentProject: null };
+let editorHistory = {};   // keyed by "projId::fileName"
+let editorHistIdx = {};
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+const textarea   = document.getElementById('code-input');
+const consoleBody = document.getElementById('console-body');
+const errBadge   = document.getElementById('err-badge');
+
+function init() {
+  const saved = loadStore();
+  if (saved && saved.projects && Object.keys(saved.projects).length > 0) {
+    state.projects = saved.projects;
+    state.currentProject = saved.currentProject || Object.keys(saved.projects)[0];
+  } else {
+    const id = uid();
+    state.projects[id] = defaultProject('Mon Projet');
+    state.currentProject = id;
+  }
+  loadProject(state.currentProject);
+  textarea.addEventListener('input', onInput);
+  textarea.addEventListener('keydown', onKeyDown);
+  // restore console collapsed state
+  try {
+    const saved = localStorage.getItem('codepocket_console');
+    if (saved === '1') {
+      consoleCollapsed = true;
+      document.getElementById('console-wrap').classList.add('collapsed');
+      document.getElementById('con-toggle').textContent = '▼';
+    }
+  } catch(e) {}
+  addConsole('info', '🚀 CodePocket chargé — appui long sur un onglet pour renommer');
+}
+
+// ═══════════════════════════════════════════════════════
+// PROJECT MANAGEMENT
+// ═══════════════════════════════════════════════════════
+let renamingProjectId = null;
+
+function loadProject(id) {
+  state.currentProject = id;
+  const proj = state.projects[id];
+  document.getElementById('proj-name').textContent = proj.name;
+  // ensure currentFile is valid
+  if (!proj.files[proj.currentFile]) proj.currentFile = Object.keys(proj.files)[0];
+  renderTabs();
+  loadFile(proj.currentFile);
+  saveStore();
+}
+
+function openProjects() {
+  renderProjectList();
+  document.getElementById('proj-panel').classList.add('open');
+}
+function closeProjects() {
+  document.getElementById('proj-panel').classList.remove('open');
+}
+
+function renderProjectList() {
+  const list = document.getElementById('proj-list');
+  list.innerHTML = '';
+  Object.entries(state.projects)
+    .sort((a,b) => b[1].created - a[1].created)
+    .forEach(([id, proj]) => {
+      const item = document.createElement('div');
+      item.className = 'proj-item' + (id === state.currentProject ? ' active-proj' : '');
+      const fileCount = Object.keys(proj.files).length;
+      item.innerHTML = `
+        <div class="proj-icon">📁</div>
+        <div class="proj-info">
+          <div class="proj-item-name">${escHtml(proj.name)}</div>
+          <div class="proj-item-meta">${fileCount} fichier${fileCount > 1 ? 's' : ''}</div>
+        </div>
+        <div class="proj-actions">
+          <div class="proj-act" title="Renommer" onclick="event.stopPropagation();openRenameProject('${id}')">✏️</div>
+          <div class="proj-act" title="Supprimer" onclick="event.stopPropagation();deleteProject('${id}')">🗑</div>
+        </div>`;
+      item.addEventListener('click', () => {
+        // save current before switching
+        saveCurrentFileContent();
+        loadProject(id);
+        closeProjects();
+        showToast('📁 ' + proj.name);
+      });
+      list.appendChild(item);
+    });
+}
+
+function openNewProject() {
+  showProjModal({
+    title: '📁 Nouveau projet',
+    input: true,
+    inputPlaceholder: 'Nom du projet',
+    inputValue: '',
+    okLabel: 'Créer',
+    okStyle: '',
+    onOk: confirmCreateProject
+  });
+}
+function confirmCreateProject() {
+  const name = document.getElementById('proj-modal-input').value.trim();
+  if (!name) return showToast('⚠️ Nom requis');
+  const id = uid();
+  state.projects[id] = defaultProject(name);
+  saveCurrentFileContent();
+  closeProjModal();
+  setTimeout(() => {
+    loadProject(id);
+    closeProjects();
+    showToast('✓ Projet créé: ' + name);
+  }, 100);
+}
+
+function openRenameProject(id) {
+  renamingProjectId = id;
+  showProjModal({
+    title: '✏️ Renommer le projet',
+    input: true,
+    inputPlaceholder: 'Nom du projet',
+    inputValue: state.projects[id].name,
+    okLabel: 'Renommer',
+    okStyle: '',
+    onOk: confirmRenameProject
+  });
+}
+function confirmRenameProject() {
+  const newName = document.getElementById('proj-modal-input').value.trim();
+  if (!newName) return showToast('⚠️ Nom requis');
+  state.projects[renamingProjectId].name = newName;
+  if (renamingProjectId === state.currentProject)
+    document.getElementById('proj-name').textContent = newName;
+  renamingProjectId = null;
+  closeProjModal();
+  renderProjectList();
+  saveStore();
+  showToast('✏️ Renommé → ' + newName);
+}
+
+function deleteProject(id) {
+  if (Object.keys(state.projects).length <= 1) return showToast('⚠️ Impossible de supprimer le seul projet');
+  const pname = state.projects[id].name;
+  showProjModal({
+    title: '🗑 Supprimer le projet ?',
+    msg: '"' + pname + '" et tous ses fichiers seront supprimés définitivement.',
+    input: false,
+    okLabel: 'Supprimer',
+    okStyle: 'background:var(--red)',
+    onOk: () => {
+      closeProjModal();
+      delete state.projects[id];
+      if (state.currentProject === id) {
+        const newId = Object.keys(state.projects)[0];
+        loadProject(newId);
+        closeProjects();
+      }
+      renderProjectList();
+      saveStore();
+      showToast('🗑 ' + pname + ' supprimé');
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// FILE MANAGEMENT
+// ═══════════════════════════════════════════════════════
+let renamingFile = null;
+
+function proj() { return state.projects[state.currentProject]; }
+function curFile() { return proj().currentFile; }
+
+function renderTabs() {
+  const container = document.getElementById('tabs');
+  const addBtn = document.getElementById('add-file-btn');
+  container.querySelectorAll('.tab').forEach(t => t.remove());
+
+  Object.keys(proj().files).forEach(name => {
+    const tab = document.createElement('div');
+    tab.className = 'tab' + (name === curFile() ? ' active' : '');
+    tab.dataset.name = name;
+
+    const dot = document.createElement('div');
+    dot.className = 'tab-dot';
+    dot.style.background = proj().files[name].color;
+
+    const label = document.createElement('div');
+    label.className = 'tab-name';
+    label.textContent = name;
+
+    const x = document.createElement('div');
+    x.className = 'tab-x';
+    x.textContent = '✕';
+    x.addEventListener('click', e => { e.stopPropagation(); deleteFile(name); });
+
+    // Long press / dblclick = rename
+    let pressTimer;
+    tab.addEventListener('touchstart', () => { pressTimer = setTimeout(() => openRenameFile(name), 550); }, {passive:true});
+    tab.addEventListener('touchend', () => clearTimeout(pressTimer));
+    tab.addEventListener('touchmove', () => clearTimeout(pressTimer));
+    tab.addEventListener('dblclick', () => openRenameFile(name));
+    tab.addEventListener('click', () => switchFile(name));
+
+    tab.appendChild(dot);
+    tab.appendChild(label);
+    tab.appendChild(x);
+    container.insertBefore(tab, addBtn);
+  });
+}
+
+function loadFile(name) {
+  proj().currentFile = name;
+  const content = proj().files[name]?.content ?? '';
+  textarea.value = content;
+  const hkey = state.currentProject + '::' + name;
+  if (!editorHistory[hkey]) { editorHistory[hkey] = [content]; editorHistIdx[hkey] = 0; }
+}
+
+function switchFile(name) {
+  saveCurrentFileContent();
+  loadFile(name);
+  renderTabs();
+  saveStore();
+}
+
+function saveCurrentFileContent() {
+  if (proj().files[curFile()]) proj().files[curFile()].content = textarea.value;
+}
+
+function openNewFile() {
+  document.getElementById('new-fname').value = '';
+  document.getElementById('new-file-panel').classList.add('open');
+  setTimeout(() => document.getElementById('new-fname').focus(), 300);
+}
+function setPreset(name) {
+  document.getElementById('new-fname').value = name;
+  document.getElementById('new-fname').focus();
+}
+function confirmNewFile() {
+  const name = document.getElementById('new-fname').value.trim();
+  if (!name) return showToast('⚠️ Nom requis');
+  if (proj().files[name]) return showToast('⚠️ Fichier existant');
+  const color = name.endsWith('.html') ? '#f06292' : name.endsWith('.css') ? '#60a5fa' :
+                name.endsWith('.js') ? '#fbbf24' : name.endsWith('.json') ? '#4ade80' : '#9ca3af';
+  proj().files[name] = { content: '', color };
+  closePanelOverlay('new-file-panel');
+  switchFile(name);
+  showToast('✓ ' + name + ' créé');
+}
+
+function deleteFile(name) {
+  if (Object.keys(proj().files).length <= 1) return showToast('⚠️ Impossible de supprimer le dernier fichier');
+  showConfirm(
+    '🗑 Supprimer le fichier ?',
+    `"${name}" sera supprimé définitivement.`,
+    () => {
+      delete proj().files[name];
+      if (curFile() === name) { const first = Object.keys(proj().files)[0]; loadFile(first); }
+      renderTabs();
+      saveStore();
+      showToast('🗑 ' + name);
+    }
+  );
+}
+
+function openRenameFile(name) {
+  renamingFile = name;
+  document.getElementById('rename-input').value = name;
+  document.getElementById('rename-panel').classList.add('open');
+  setTimeout(() => document.getElementById('rename-input').focus(), 300);
+}
+function confirmRename() {
+  const newName = document.getElementById('rename-input').value.trim();
+  if (!newName) return showToast('⚠️ Nom requis');
+  if (newName === renamingFile) { closePanelOverlay('rename-panel'); return; }
+  if (proj().files[newName]) return showToast('⚠️ Nom déjà utilisé');
+  // save current content before rename
+  saveCurrentFileContent();
+  const wasActive = curFile() === renamingFile;
+  // create new entry preserving order via rebuild
+  const newFiles = {};
+  Object.keys(proj().files).forEach(k => {
+    newFiles[k === renamingFile ? newName : k] = proj().files[k];
+  });
+  proj().files = newFiles;
+  const oldHkey = state.currentProject + '::' + renamingFile;
+  const newHkey = state.currentProject + '::' + newName;
+  editorHistory[newHkey] = editorHistory[oldHkey] || [''];
+  editorHistIdx[newHkey] = editorHistIdx[oldHkey] || 0;
+  delete editorHistory[oldHkey]; delete editorHistIdx[oldHkey];
+  if (wasActive) proj().currentFile = newName;
+  renamingFile = null;
+  closePanelOverlay('rename-panel');
+  renderTabs();
+  // reload textarea so it reflects the rename immediately
+  textarea.value = proj().files[curFile()].content;
+  saveStore();
+  showToast('✏️ → ' + newName);
+}
+
+// ═══════════════════════════════════════════════════════
+// DOWNLOAD
+// ═══════════════════════════════════════════════════════
+function openDownload() {
+  saveCurrentFileContent();
+  const list = document.getElementById('dl-file-list');
+  list.innerHTML = '';
+  Object.entries(proj().files).forEach(([name, f]) => {
+    const size = new Blob([f.content]).size;
+    const sizeStr = size < 1024 ? size + ' B' : (size/1024).toFixed(1) + ' KB';
+    const item = document.createElement('div');
+    item.className = 'dl-file-item';
+    item.innerHTML = `<div class="dl-dot" style="background:${f.color}"></div>
+      <div class="dl-fname">${escHtml(name)}</div>
+      <div class="dl-size">${sizeStr}</div>
+      <span style="font-size:14px">⬇</span>`;
+    item.addEventListener('click', () => { downloadFile(name, f.content); showToast('⬇ ' + name); });
+    list.appendChild(item);
+  });
+  document.getElementById('dl-panel').classList.add('open');
+}
+
+function downloadFile(name, content) {
+  const blob = new Blob([content], {type: 'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function downloadAll() {
+  saveCurrentFileContent();
+  const files = proj().files;
+  let i = 0;
+  const names = Object.keys(files);
+  function next() {
+    if (i >= names.length) { showToast('⬇ Tous les fichiers téléchargés!'); return; }
+    downloadFile(names[i], files[names[i]].content);
+    i++;
+    setTimeout(next, 400);
+  }
+  next();
+  closePanelOverlay('dl-panel');
+}
+
+// ═══════════════════════════════════════════════════════
+// EDITOR
+// ═══════════════════════════════════════════════════════
+let mode = 'editor';
+let previewTimeout = null;
+let errorCount = 0;
+let consoleCollapsed = false;
+
+function onInput() {
+  saveCurrentFileContent();
+  schedulePreview();
+  pushHistory();
+  saveStore();
+}
+
+function setMode(m) {
+  mode = m;
+  document.querySelectorAll('.mode-btn').forEach((b, i) => {
+    b.classList.toggle('active', ['editor','preview'][i] === m);
+  });
+  document.getElementById('editor-wrap').classList.toggle('hidden', m === 'preview');
+  document.getElementById('preview-wrap').classList.toggle('hidden', m === 'editor');
+  if (m === 'preview') runCode();
+}
+
+function schedulePreview() {
+  clearTimeout(previewTimeout);
+  previewTimeout = setTimeout(() => { if (mode === 'preview') runCode(); }, 700);
+}
+
+function runCode() {
+  saveCurrentFileContent();
+  const frame = document.getElementById('preview-frame');
+  frame.srcdoc = buildDoc();
+  showToast('✓ Exécuté');
+  frame.onload = () => {
+    try {
+      const win = frame.contentWindow;
+      ['log','warn','error','info'].forEach(type => {
+        win.console[type] = (...args) => {
+          addConsole(type, args.map(a => {
+            try { return typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a); }
+            catch { return String(a); }
+          }).join(' '));
+        };
+      });
+      win.addEventListener('error', e => addConsole('error', e.message));
+    } catch(e) {}
+  };
+}
+
+function buildDoc() {
+  const files = proj().files;
+  const htmlName = Object.keys(files).find(n => n.endsWith('.html'));
+  const cssNames = Object.keys(files).filter(n => n.endsWith('.css'));
+  const jsNames  = Object.keys(files).filter(n => n.endsWith('.js'));
+  let html = files[htmlName]?.content || '<body></body>';
+  const css = cssNames.map(n => `<style>/* ${n} */\n${files[n].content}</style>`).join('\n');
+  const js  = jsNames.map(n => `/* ${n} */\n${files[n].content}`).join('\n\n');
+  html = html.includes('</head>') ? html.replace('</head>', css + '\n</head>') : css + html;
+  const script = `<script>window.onerror=(m)=>console.error(m);\n${js}<\/script>`;
+  html = html.includes('</body>') ? html.replace('</body>', script + '\n</body>') : html + script;
+  return html;
+}
+
+// ── CONSOLE ──
+function addConsole(type, msg) {
+  const time = new Date().toLocaleTimeString('fr', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const div = document.createElement('div');
+  div.className = 'cline ' + type;
+  div.innerHTML = `<span class="ct">${time}</span><span class="cm">${escHtml(msg)}</span>`;
+  consoleBody.appendChild(div);
+  consoleBody.scrollTop = consoleBody.scrollHeight;
+  if (type === 'error') {
+    errorCount++;
+    errBadge.textContent = errorCount;
+    errBadge.style.display = 'block';
+  }
+}
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function toggleConsole() {
+  consoleCollapsed = !consoleCollapsed;
+  document.getElementById('console-wrap').classList.toggle('collapsed', consoleCollapsed);
+  document.getElementById('con-toggle').textContent = consoleCollapsed ? '▼' : '▲';
+  try { localStorage.setItem('codepocket_console', consoleCollapsed ? '1' : '0'); } catch(e) {}
+}
+
+// ── HISTORY ──
+function pushHistory() {
+  const hkey = state.currentProject + '::' + curFile();
+  const val = textarea.value;
+  if (!editorHistory[hkey]) { editorHistory[hkey] = []; editorHistIdx[hkey] = -1; }
+  if (editorHistory[hkey][editorHistIdx[hkey]] === val) return;
+  editorHistory[hkey] = editorHistory[hkey].slice(0, editorHistIdx[hkey] + 1);
+  editorHistory[hkey].push(val);
+  if (editorHistory[hkey].length > 60) editorHistory[hkey].shift();
+  editorHistIdx[hkey] = editorHistory[hkey].length - 1;
+}
+function undoCode() {
+  const hkey = state.currentProject + '::' + curFile();
+  if (!editorHistory[hkey] || editorHistIdx[hkey] <= 0) return;
+  editorHistIdx[hkey]--;
+  textarea.value = editorHistory[hkey][editorHistIdx[hkey]];
+  proj().files[curFile()].content = textarea.value;
+}
+function redoCode() {
+  const hkey = state.currentProject + '::' + curFile();
+  if (!editorHistory[hkey] || editorHistIdx[hkey] >= editorHistory[hkey].length - 1) return;
+  editorHistIdx[hkey]++;
+  textarea.value = editorHistory[hkey][editorHistIdx[hkey]];
+  proj().files[curFile()].content = textarea.value;
+}
+
+// ── KEYBOARD ──
+function onKeyDown(e) {
+  if (e.key === 'Tab') { e.preventDefault(); ins('  '); return; }
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    const line = textarea.value.substring(0, textarea.selectionStart).split('\n').pop();
+    ins('\n' + line.match(/^(\s*)/)[1]);
+    return;
+  }
+  const pairs = { '(':')', '[':']', '{':'}' };
+  if (e.key in pairs) {
+    e.preventDefault();
+    const s = textarea.selectionStart, en = textarea.selectionEnd;
+    const sel = textarea.value.substring(s, en);
+    if (sel) { wrapSel(e.key, pairs[e.key]); }
+    else { const p = s; ins(e.key + pairs[e.key]); textarea.selectionStart = textarea.selectionEnd = p + 1; }
+  }
+}
+
+function ins(text) {
+  const s = textarea.selectionStart, e = textarea.selectionEnd;
+  textarea.value = textarea.value.slice(0,s) + text + textarea.value.slice(e);
+  textarea.selectionStart = textarea.selectionEnd = s + text.length;
+  textarea.focus(); onInput();
+}
+function wrapSel(open, close) {
+  const s = textarea.selectionStart, e = textarea.selectionEnd;
+  const sel = textarea.value.substring(s, e);
+  textarea.value = textarea.value.slice(0,s) + open + sel + close + textarea.value.slice(e);
+  textarea.selectionStart = s + open.length;
+  textarea.selectionEnd = s + open.length + sel.length;
+  textarea.focus(); onInput();
+}
+function copyCode() {
+  navigator.clipboard?.writeText(textarea.value).then(() => showToast('📋 Copié!'));
+}
+
+// ── PANELS ──
+function showProjModal(opts) {
+  const modal = document.getElementById('proj-modal');
+  const sheet = document.getElementById('proj-modal-sheet');
+  document.getElementById('proj-modal-title').textContent = opts.title || '';
+  const msgEl = document.getElementById('proj-modal-msg');
+  if (opts.msg) { msgEl.textContent = opts.msg; msgEl.style.display = 'block'; }
+  else { msgEl.style.display = 'none'; }
+  const inp = document.getElementById('proj-modal-input');
+  if (opts.input) {
+    inp.placeholder = opts.inputPlaceholder || '';
+    inp.value = opts.inputValue || '';
+    inp.style.display = 'block';
+    setTimeout(() => inp.focus(), 300);
+  } else {
+    inp.style.display = 'none';
+  }
+  const okBtn = document.getElementById('proj-modal-ok');
+  okBtn.textContent = opts.okLabel || 'OK';
+  okBtn.style.cssText = opts.okStyle || '';
+  okBtn.onclick = opts.onOk;
+  modal.style.display = 'flex';
+  requestAnimationFrame(() => { sheet.style.transform = 'translateY(0)'; });
+}
+function closeProjModal() {
+  const modal = document.getElementById('proj-modal');
+  const sheet = document.getElementById('proj-modal-sheet');
+  sheet.style.transform = 'translateY(100%)';
+  setTimeout(() => { modal.style.display = 'none'; }, 260);
+}
+function showConfirm(title, msg, onOk) {
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-msg').textContent = msg;
+  const btn = document.getElementById('confirm-ok-btn');
+  btn.onclick = () => { closePanelOverlay('confirm-panel'); onOk(); };
+  document.getElementById('confirm-panel').classList.add('open');
+}
+function closePanelOverlay(id, e) {
+  if (!e || e.target === document.getElementById(id))
+    document.getElementById(id).classList.remove('open');
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+// ── UTIL ──
+function uid() { return Math.random().toString(36).slice(2,10) + Date.now().toString(36); }
+
+// ── ENTER on inputs ──
+document.getElementById('proj-modal-input').addEventListener('keydown', e => { if(e.key==='Enter') { const fn = document.getElementById('proj-modal-ok').onclick; if(fn) fn(); } });
+document.getElementById('new-fname').addEventListener('keydown', e => { if(e.key==='Enter') confirmNewFile(); });
+document.getElementById('rename-input').addEventListener('keydown', e => { if(e.key==='Enter') confirmRename(); });
+
+// ── START ──
+init();
+</script>
+
+<!-- PROJ MODAL (new / rename / delete project) -->
+<div id="proj-modal" style="
+  display:none;position:fixed;inset:0;z-index:999;
+  background:rgba(0,0,0,0.65);align-items:flex-end;
+" onclick="if(event.target===this)closeProjModal()">
+  <div id="proj-modal-sheet" style="
+    width:100%;background:var(--surface);border-radius:18px 18px 0 0;
+    padding:20px 20px 40px;
+    transform:translateY(100%);transition:transform .25s;
+  ">
+    <div class="sh-title" id="proj-modal-title"></div>
+    <p id="proj-modal-msg" style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.5;display:none"></p>
+    <input class="sh-input" id="proj-modal-input" placeholder="" style="display:none" />
+    <div class="sh-row">
+      <button class="sh-btn cancel" onclick="closeProjModal()">Annuler</button>
+      <button class="sh-btn ok" id="proj-modal-ok">OK</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
